@@ -5,14 +5,28 @@ import logging
 import sys
 import os
 sys.path.append('./common_lib/libraries')
+from micro_python_board import MicroPythonBoard
+from board import ComPort
 import discovery
 
 
 def main(upload: str, repl: str = ""):
-    boards = discovery.get_connected_boards()
-    if len(boards) == 0:
-        logging.error("No boards found")
-        exit(1)
+
+    board = object()
+    if repl and len(repl) > 3:
+        board = MicroPythonBoard(repl=ComPort({'device': repl}))
+    else:
+        boards = discovery.get_connected_boards()
+        if len(boards) == 0:
+            logging.error("No boards found")
+            exit(1)
+        choice = 0
+        if len(boards) > 1:
+            print("Which board do you want to upload to?")
+            for i, board in enumerate(boards):
+                print(f"{i}: {board.id} {board.ports}")
+            choice = int(input("Enter the number of the board: "))
+        board = boards[choice]
 
     # check if upload is a file or directory
     files = []
@@ -25,13 +39,6 @@ def main(upload: str, repl: str = ""):
         logging.error(f"Error!  {upload} is not a file or directory.")
         exit(1)
 
-    choice = 0
-    if len(boards) > 1:
-        print("Which board do you want to upload to?")
-        for i, board in enumerate(boards):
-            print(f"{i}: {board.id} {board.ports}")
-        choice = int(input("Enter the number of the board: "))
-    board = boards[choice]
     board.open_ports()
     board.close_repl_uart()
     board.open_raw_repl_uart()
@@ -56,10 +63,9 @@ if __name__ == "__main__":
     )
     parser.add_argument("-u", "--upload", required=True,
                         help="upload a file or all files in directory")
-    # TODO: Implement option to specify board by com port
-    # parser.add_argument(
-    #     "-r", "--repl", help="The REPL com port to use for file upload"
-    # )
+    parser.add_argument(
+        "-r", "--repl", help="The REPL com port to use for file upload"
+    )
 
     logging.basicConfig(
         format="%(asctime)s | %(levelname)s | %(message)s", level=logging.INFO
@@ -69,4 +75,4 @@ if __name__ == "__main__":
         logging.info("Debugging mode enabled")
         logging.getLogger().setLevel(logging.DEBUG)
 
-    main(args.upload)
+    main(args.upload, args.repl)
