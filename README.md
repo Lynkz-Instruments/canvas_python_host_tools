@@ -21,7 +21,7 @@ This repo hosts various software tools that can be used with devices running Can
 ### Checkout the Firmware
 
 ```
-git clone --recurse-submodules https://github.com/rfpros/canvas_software_suite_tools.git
+git clone --recurse-submodules https://github.com/LairdCP/canvas_software_suite_tools.git
 ```
 
 ### Install Python Dependencies
