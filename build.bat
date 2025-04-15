@@ -1,0 +1,1 @@
+pyinstaller --onefile --distpath compiled\dist --workpath compiled\build --specpath compiled\ --paths=./common_lib/libraries -n FileUploader file_uploader.py
